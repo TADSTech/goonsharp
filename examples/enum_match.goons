@@ -1,0 +1,51 @@
+// Enum and Pattern Matching demo
+goonenum GoonTier {
+    Bronze,
+    Silver,
+    Gold,
+    Diamond,
+    Transcended,
+}
+
+goonsesh tier_name(tier: &GoonTier) -> &str {
+    goonmatch tier {
+        GoonTier::Bronze => "Bronze Goon",
+        GoonTier::Silver => "Silver Goon",
+        GoonTier::Gold => "Gold Goon",
+        GoonTier::Diamond => "Diamond Goon",
+        GoonTier::Transcended => "TRANSCENDED GOON",
+    }
+}
+
+goonsesh tier_power(tier: &GoonTier) -> i32 {
+    goonmatch tier {
+        GoonTier::Bronze => 10,
+        GoonTier::Silver => 50,
+        GoonTier::Gold => 200,
+        GoonTier::Diamond => 1000,
+        GoonTier::Transcended => 9999,
+    }
+}
+
+goonsesh main() {
+    goon tiers = [
+        GoonTier::Bronze,
+        GoonTier::Silver,
+        GoonTier::Gold,
+        GoonTier::Diamond,
+        GoonTier::Transcended,
+    ];
+
+    goonfor tier goonin &tiers {
+        goonprint!("{}: power level {}", tier_name(tier), tier_power(tier));
+    }
+
+    // Pattern matching with destructuring
+    goon point = (3, 7);
+    goonmatch point {
+        (0, 0) => goonprint!("origin"),
+        (x, 0) => goonprint!("on x-axis at {}", x),
+        (0, y) => goonprint!("on y-axis at {}", y),
+        (x, y) => goonprint!("at ({}, {})", x, y),
+    }
+}

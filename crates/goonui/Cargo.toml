@@ -1,0 +1,9 @@
+[package]
+name = "goonui"
+version.workspace = true
+edition.workspace = true
+description = "GoonUI — desktop UI framework for GoonSharp (powered by egui)"
+
+[dependencies]
+eframe = "0.29"
+egui = "0.29"

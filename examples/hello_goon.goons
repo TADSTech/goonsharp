@@ -1,0 +1,4 @@
+// Hello Goon - The simplest GoonSharp program
+goonsesh main() {
+    goonprint!("Hello, Goon World! 🟣");
+}

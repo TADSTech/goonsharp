@@ -1,0 +1,9 @@
+[package]
+name = "goonsharp-parser"
+version.workspace = true
+edition.workspace = true
+description = "The lexer, parser, and AST for GoonSharp — the ultimate meme language"
+
+[dependencies]
+chumsky.workspace = true
+ariadne.workspace = true

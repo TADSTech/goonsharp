@@ -1,0 +1,19 @@
+// Coom Counter - demonstrating loops and mutability
+goonsesh main() {
+    goon gooning count = 0;
+    goon target = 10;
+
+    goonprint!("Starting the coom counter...");
+
+    goonloop {
+        count += 1;
+        goonprint!("Count: {} / {}", count, target);
+
+        goonif (count >= target) {
+            goonprint!("💦 COOM ACHIEVED at count {}", count);
+            coom;
+        }
+    }
+
+    goonprint!("Post-coom clarity: final count was {}", count);
+}

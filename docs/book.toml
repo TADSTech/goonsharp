@@ -1,0 +1,14 @@
+[book]
+title = "The GoonSharp Book"
+authors = ["The Goon Council"]
+description = "The definitive guide to the ultimate shitpost programming language."
+language = "en"
+
+[build]
+build-dir = "book"
+
+[output.html]
+default-theme = "coal"
+preferred-dark-theme = "coal"
+git-repository-url = "https://github.com/goonsharp/goonsharp"
+site-url = "https://goonsharp.dev/book/"

@@ -1,0 +1,30 @@
+[workspace]
+members = [
+    "crates/goonsharp-parser",
+    "crates/goonsharp-codegen",
+    "crates/goonsharp-cli",
+    "crates/goonhub",
+    "crates/goonui",
+    "crates/goonsharp-web",
+]
+resolver = "2"
+
+[workspace.package]
+version = "69.0.0"
+edition = "2021"
+license = "MIT OR Unlicense"
+repository = "https://github.com/goonsharp/goonsharp"
+description = "The ultimate shitpost programming language"
+
+[workspace.dependencies]
+goonsharp-parser = { path = "crates/goonsharp-parser" }
+goonsharp-codegen = { path = "crates/goonsharp-codegen" }
+chumsky = "0.9"
+ariadne = "0.4"
+clap = { version = "4", features = ["derive"] }
+colored = "2"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+toml = "0.8"
+wasm-bindgen = "0.2"
+serde-wasm-bindgen = "0.6"

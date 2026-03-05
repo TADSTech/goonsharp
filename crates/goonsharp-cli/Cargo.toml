@@ -1,0 +1,16 @@
+[package]
+name = "goonsharp"
+version.workspace = true
+edition.workspace = true
+description = "GoonSharp compiler CLI — goon your way to production"
+
+[[bin]]
+name = "goonsharp"
+path = "src/main.rs"
+
+[dependencies]
+goonsharp-parser.workspace = true
+goonsharp-codegen.workspace = true
+clap.workspace = true
+colored.workspace = true
+ariadne.workspace = true

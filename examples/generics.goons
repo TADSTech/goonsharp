@@ -1,0 +1,65 @@
+// Generic data structures
+goonstruct GoonStack<T> {
+    items: Vec<T>,
+    name: String,
+}
+
+goonimpl<T: std::fmt::Debug> GoonStack<T> {
+    goonsesh new(name: &str) -> Self {
+        Self {
+            items: Vec::new(),
+            name: name.to_string(),
+        }
+    }
+
+    goonsesh push(&gooning self, item: T) {
+        goonprint!("[{}] Pushing {:?}", self.name, item);
+        self.items.push(item);
+    }
+
+    goonsesh pop(&gooning self) -> Option<T> {
+        goon result = self.items.pop();
+        goonmatch &result {
+            Some(item) => goonprint!("[{}] Popped {:?}", self.name, item),
+            no_goon => goonprint!("[{}] Stack is empty!", self.name),
+        }
+        result
+    }
+
+    goonsesh peek(&self) -> Option<&T> {
+        self.items.last()
+    }
+
+    goonsesh len(&self) -> usize {
+        self.items.len()
+    }
+
+    goonsesh is_empty(&self) -> bool {
+        self.items.is_empty()
+    }
+}
+
+goonsesh main() {
+    goon gooning stack: GoonStack<i32> = GoonStack::new("NumberStack");
+
+    stack.push(10);
+    stack.push(20);
+    stack.push(30);
+
+    goonprint!("Stack size: {}", stack.len());
+
+    stack.pop();
+    stack.pop();
+    stack.pop();
+    stack.pop(); // empty pop
+
+    goonprint!("\n--- String Stack ---");
+    goon gooning names: GoonStack<String> = GoonStack::new("NameStack");
+    names.push("Chad".to_string());
+    names.push("Brad".to_string());
+    names.push("Thad".to_string());
+
+    goonwhile (!names.is_empty()) {
+        names.pop();
+    }
+}

@@ -1,0 +1,132 @@
+{
+  "goonsesh (function)": {
+    "prefix": "goonsesh",
+    "body": [
+      "goonsesh ${1:name}(${2:params}) ${3:-> ${4:ReturnType} }{",
+      "\t$0",
+      "}"
+    ],
+    "description": "Define a new goonsesh (function)"
+  },
+  "goonsesh main": {
+    "prefix": "goonmain",
+    "body": [
+      "goonsesh main() {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Main goonsesh entry point"
+  },
+  "goon (let mut)": {
+    "prefix": "goon ",
+    "body": "goon ${1:name} = ${2:value};",
+    "description": "Declare a mutable goon variable"
+  },
+  "goonconst (let)": {
+    "prefix": "goonconst",
+    "body": "goonconst ${1:name} = ${2:value};",
+    "description": "Declare an immutable goon constant"
+  },
+  "goonprint!": {
+    "prefix": "goonprint",
+    "body": "goonprint!(\"${1:message}\");",
+    "description": "Print to stdout with style"
+  },
+  "goonif": {
+    "prefix": "goonif",
+    "body": [
+      "goonif (${1:condition}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "If statement"
+  },
+  "goonif/goonelse": {
+    "prefix": "goonifelse",
+    "body": [
+      "goonif (${1:condition}) {",
+      "\t$2",
+      "} goonelse {",
+      "\t$0",
+      "}"
+    ],
+    "description": "If/else statement"
+  },
+  "goonloop": {
+    "prefix": "goonloop",
+    "body": [
+      "goonloop (${1:condition}) {",
+      "\t$0",
+      "}"
+    ],
+    "description": "While loop"
+  },
+  "goonfor": {
+    "prefix": "goonfor",
+    "body": [
+      "goonfor ${1:item} goonin ${2:iter} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "For loop"
+  },
+  "goonforever": {
+    "prefix": "goonforever",
+    "body": [
+      "goonforever {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Infinite loop"
+  },
+  "goonstruct": {
+    "prefix": "goonstruct",
+    "body": [
+      "goonstruct ${1:Name} {",
+      "\t${2:field}: ${3:Type},",
+      "}"
+    ],
+    "description": "Define a goonstruct"
+  },
+  "goonenum": {
+    "prefix": "goonenum",
+    "body": [
+      "goonenum ${1:Name} {",
+      "\t${2:Variant},",
+      "}"
+    ],
+    "description": "Define a goonenum"
+  },
+  "goonimpl": {
+    "prefix": "goonimpl",
+    "body": [
+      "goonimpl ${1:Type} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Impl block"
+  },
+  "goontrait": {
+    "prefix": "goontrait",
+    "body": [
+      "goontrait ${1:Name} {",
+      "\t$0",
+      "}"
+    ],
+    "description": "Define a goontrait"
+  },
+  "goonmatch": {
+    "prefix": "goonmatch",
+    "body": [
+      "goonmatch ${1:expr} {",
+      "\t${2:pattern} => ${3:expr},",
+      "}"
+    ],
+    "description": "Match expression"
+  },
+  "goonuse": {
+    "prefix": "goonuse",
+    "body": "goonuse ${1:path};",
+    "description": "Use/import"
+  }
+}

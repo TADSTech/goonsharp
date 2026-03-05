@@ -1,0 +1,20 @@
+goonsesh main() {
+    goon counter = 10;
+    goon message = "gooning hard";
+
+    goonloop (counter > 0) {
+        goonprint!("{} - {}", counter, message);
+        counter = counter - 1;
+    }
+
+    goonif (counter == 0) {
+        goonprint!("session over. you coomed.");
+    }
+
+    goonsesh add(a: i32, b: i32) -> i32 {
+        goonreturn a + b;
+    }
+
+    goon result = add(69, 420);
+    goonprint!("final goon score: {}", result);
+}

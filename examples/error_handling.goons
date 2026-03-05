@@ -1,0 +1,49 @@
+// Error handling with Result and Option
+goonsesh parse_goon_number(s: &str) -> Result<i32, String> {
+    goonmatch s.parse::<i32>() {
+        Ok(n) => {
+            goonif (n < 0) {
+                Err("negative goon energy".to_string())
+            } goonnah {
+                Ok(n)
+            }
+        },
+        Err(e) => Err(goonformat!("parse error: {}", e)),
+    }
+}
+
+goonsesh find_goon(goons: &[&str], target: &str) -> Option<usize> {
+    goonfor (i, goon_name) goonin goons.iter().enumerate() {
+        goonif (*goon_name == target) {
+            goonreturn Some(i);
+        }
+    }
+    no_goon
+}
+
+goonsesh main() {
+    // Result handling
+    goon inputs = ["42", "69", "abc", "-1", "420"];
+
+    goonfor input goonin &inputs {
+        goonmatch parse_goon_number(input) {
+            Ok(n) => goonprint!("✅ '{}' -> {}", input, n),
+            Err(e) => goonprint!("❌ '{}' -> {}", input, e),
+        }
+    }
+
+    goonprint!("");
+
+    // Option handling
+    goon squad = ["Chad", "Brad", "Thad", "Dad"];
+
+    goonmatch find_goon(&squad, "Thad") {
+        Some(idx) => goonprint!("Found Thad at index {}", idx),
+        no_goon => goonprint!("Thad not found"),
+    }
+
+    goonmatch find_goon(&squad, "Vlad") {
+        Some(idx) => goonprint!("Found Vlad at index {}", idx),
+        no_goon => goonprint!("Vlad not in the squad"),
+    }
+}

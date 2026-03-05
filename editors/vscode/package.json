@@ -1,0 +1,104 @@
+{
+  "name": "goonsharp",
+  "displayName": "GoonSharp Official",
+  "description": "The official VS Code extension for GoonSharp — syntax highlighting, IntelliSense, and goon-level productivity.",
+  "version": "69.0.0",
+  "publisher": "goonsharp",
+  "icon": "icon.png",
+  "engines": {
+    "vscode": "^1.80.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Snippets",
+    "Themes"
+  ],
+  "keywords": [
+    "goonsharp",
+    "goon",
+    "meme",
+    "programming language",
+    "transpiler"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/goonsharp/goonsharp"
+  },
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onLanguage:goonsharp"
+  ],
+  "contributes": {
+    "languages": [
+      {
+        "id": "goonsharp",
+        "aliases": [
+          "GoonSharp",
+          "goonsharp",
+          "goons"
+        ],
+        "extensions": [
+          ".goons"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "goonsharp",
+        "scopeName": "source.goonsharp",
+        "path": "./syntaxes/goonsharp.tmLanguage.json"
+      }
+    ],
+    "themes": [
+      {
+        "label": "DarkGoon",
+        "uiTheme": "vs-dark",
+        "path": "./themes/goon-dark.json"
+      }
+    ],
+    "snippets": [
+      {
+        "language": "goonsharp",
+        "path": "./snippets/goonsharp.json"
+      }
+    ],
+    "taskDefinitions": [
+      {
+        "type": "goonsharp",
+        "required": [
+          "command"
+        ],
+        "properties": {
+          "command": {
+            "type": "string",
+            "description": "The goonsharp command to run"
+          },
+          "file": {
+            "type": "string",
+            "description": "The .goons file to operate on"
+          }
+        }
+      }
+    ],
+    "commands": [
+      {
+        "command": "goonsharp.run",
+        "title": "GoonSharp: Run Current File",
+        "icon": "$(play)"
+      },
+      {
+        "command": "goonsharp.build",
+        "title": "GoonSharp: Build Current File"
+      },
+      {
+        "command": "goonsharp.check",
+        "title": "GoonSharp: Check Current File"
+      },
+      {
+        "command": "goonsharp.emitRust",
+        "title": "GoonSharp: Show Transpiled Rust"
+      }
+    ]
+  }
+}

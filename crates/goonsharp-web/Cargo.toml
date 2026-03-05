@@ -1,0 +1,14 @@
+[package]
+name = "goonsharp-web"
+version.workspace = true
+edition.workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+goonsharp-parser = { path = "../goonsharp-parser" }
+goonsharp-codegen = { path = "../goonsharp-codegen" }
+wasm-bindgen = "0.2"
+serde = { workspace = true, features = ["derive"] }
+serde-wasm-bindgen = "0.6"

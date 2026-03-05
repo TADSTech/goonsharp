@@ -1,0 +1,14 @@
+// FizzBuzz but make it goon
+goonsesh main() {
+    goonfor i goonin 1..=100 {
+        goonif (i % 15 == 0) {
+            goonprint!("GoonBuzz");
+        } goonnah goonif (i % 3 == 0) {
+            goonprint!("Goon");
+        } goonnah goonif (i % 5 == 0) {
+            goonprint!("Buzz");
+        } goonnah {
+            goonprint!("{}", i);
+        }
+    }
+}

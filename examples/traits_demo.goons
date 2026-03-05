@@ -1,0 +1,75 @@
+// Trait demo - goontrait and goonimpl
+goontrait Fightable {
+    goonsesh attack(&self) -> i32;
+    goonsesh defend(&self) -> i32;
+
+    goonsesh battle_cry(&self) -> String {
+        "AAAAA".to_string()
+    }
+}
+
+goonstruct Warrior {
+    name: String,
+    strength: i32,
+    armor: i32,
+}
+
+goonstruct Mage {
+    name: String,
+    intellect: i32,
+    mana: i32,
+}
+
+goonimpl Fightable goonfor Warrior {
+    goonsesh attack(&self) -> i32 {
+        self.strength * 2
+    }
+
+    goonsesh defend(&self) -> i32 {
+        self.armor * 3
+    }
+
+    goonsesh battle_cry(&self) -> String {
+        goonformat!("{} screams: WITNESS ME!", self.name)
+    }
+}
+
+goonimpl Fightable goonfor Mage {
+    goonsesh attack(&self) -> i32 {
+        self.intellect * 3
+    }
+
+    goonsesh defend(&self) -> i32 {
+        self.mana
+    }
+}
+
+goonsesh announce_fighter<T: Fightable>(fighter: &T) {
+    goonprint!("{}", fighter.battle_cry());
+    goonprint!("  ATK: {} | DEF: {}", fighter.attack(), fighter.defend());
+}
+
+goonsesh main() {
+    goon warrior = Warrior {
+        name: "Goon Knight".to_string(),
+        strength: 50,
+        armor: 30,
+    };
+
+    goon mage = Mage {
+        name: "Arcane Gooner".to_string(),
+        intellect: 80,
+        mana: 40,
+    };
+
+    goonprint!("=== GOON ARENA ===");
+    announce_fighter(&warrior);
+    goonprint!("---");
+    announce_fighter(&mage);
+
+    goonif (warrior.attack() > mage.defend()) {
+        goonprint!("\nWarrior breaks through!");
+    } goonnah {
+        goonprint!("\nMage holds the line!");
+    }
+}

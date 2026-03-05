@@ -1,0 +1,38 @@
+// Closures and iterators
+goonsesh main() {
+    // Basic closures
+    goon add = |a: i32, b: i32| -> i32 { a + b };
+    goon square = |x: i32| x * x;
+
+    goonprint!("add(2, 3) = {}", add(2, 3));
+    goonprint!("square(7) = {}", square(7));
+
+    // Iterator chains
+    goon numbers: Vec<i32> = (1..=20).collect();
+
+    goon even_squares: Vec<i32> = numbers.iter()
+        .filter(|n| **n % 2 == 0)
+        .map(|n| n * n)
+        .collect();
+
+    goonprint!("Even squares: {:?}", even_squares);
+
+    // Sum with fold
+    goon total: i32 = numbers.iter().fold(0, |acc, x| acc + x);
+    goonprint!("Sum of 1..20: {}", total);
+
+    // Find
+    goon first_big = numbers.iter().find(|n| **n > 15);
+    goonmatch first_big {
+        Some(n) => goonprint!("First number > 15: {}", n),
+        no_goon => goonprint!("No number > 15 found"),
+    }
+
+    // Chained transformations
+    goon result: String = (0..5)
+        .map(|i| goonformat!("goon_{}", i))
+        .collect::<Vec<_>>()
+        .join(", ");
+
+    goonprint!("Goons: {}", result);
+}

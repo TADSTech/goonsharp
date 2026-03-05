@@ -1,0 +1,48 @@
+// Goonstruct Demo - structs, impl blocks, and methods
+goonstruct Goon {
+    name: String,
+    power_level: i32,
+    is_gooning: bool,
+}
+
+goonimpl Goon {
+    goonsesh new(name: &str, power: i32) -> Self {
+        Self {
+            name: name.to_string(),
+            power_level: power,
+            is_gooning: no_edge,
+        }
+    }
+
+    goonsesh start_gooning(&gooning self) {
+        self.is_gooning = edge;
+        goonprint!("{} has started gooning!", self.name);
+    }
+
+    goonsesh power_up(&gooning self, amount: i32) {
+        self.power_level += amount;
+        goonprint!("{} powered up to {}!", self.name, self.power_level);
+    }
+
+    goonsesh status(&self) {
+        goon state = goonif (self.is_gooning) {
+            "GOONING"
+        } goonnah {
+            "idle"
+        };
+        goonprint!("[{}] {} - Power: {}", state, self.name, self.power_level);
+    }
+}
+
+goonsesh main() {
+    goon gooning chad = Goon::new("Chad", 9001);
+    chad.status();
+    chad.start_gooning();
+    chad.power_up(420);
+    chad.status();
+
+    goon gooning virgin = Goon::new("Virgin", 1);
+    virgin.status();
+    virgin.power_up(68);
+    virgin.status();
+}

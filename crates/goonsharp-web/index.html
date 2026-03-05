@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GoonSharp Playground 🟣</title>
+    <style>
+        :root {
+            --goon-purple: #7B2FBE;
+            --goon-dark-purple: #4A1A6B;
+            --goon-pink: #FF69B4;
+            --goon-bg: #0F0A19;
+            --goon-bg-light: #1A1225;
+            --goon-surface: #231830;
+            --goon-text: #E8E0F0;
+            --goon-text-dim: #8B7FA0;
+            --goon-border: #3D2B55;
+            --goon-green: #00E676;
+            --goon-red: #FF1744;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background: var(--goon-bg);
+            color: var(--goon-text);
+            font-family: 'JetBrains Mono', 'Fira Code', 'Cascadia Code', monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            background: var(--goon-surface);
+            border-bottom: 2px solid var(--goon-purple);
+            padding: 12px 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .logo {
+            font-size: 1.5em;
+            font-weight: bold;
+            color: var(--goon-pink);
+        }
+
+        .logo span {
+            color: var(--goon-purple);
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        button {
+            background: var(--goon-purple);
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        button:hover {
+            background: var(--goon-pink);
+            transform: translateY(-1px);
+        }
+
+        button.secondary {
+            background: var(--goon-dark-purple);
+        }
+
+        .main {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2px;
+            background: var(--goon-border);
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            background: var(--goon-bg-light);
+        }
+
+        .panel-header {
+            background: var(--goon-surface);
+            padding: 8px 16px;
+            font-size: 0.85em;
+            color: var(--goon-text-dim);
+            border-bottom: 1px solid var(--goon-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-header .tag {
+            font-size: 0.75em;
+            padding: 2px 8px;
+            border-radius: 4px;
+            background: var(--goon-dark-purple);
+            color: var(--goon-pink);
+        }
+
+        textarea, .output {
+            flex: 1;
+            background: var(--goon-bg);
+            color: var(--goon-text);
+            border: none;
+            padding: 16px;
+            font-family: inherit;
+            font-size: 14px;
+            line-height: 1.6;
+            resize: none;
+            outline: none;
+            tab-size: 4;
+        }
+
+        .output {
+            white-space: pre-wrap;
+            overflow-y: auto;
+        }
+
+        .output.error {
+            color: var(--goon-red);
+        }
+
+        .output.success {
+            color: var(--goon-green);
+        }
+
+        .status-bar {
+            background: var(--goon-surface);
+            border-top: 1px solid var(--goon-border);
+            padding: 4px 16px;
+            font-size: 0.8em;
+            color: var(--goon-text-dim);
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .status-dot {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 6px;
+        }
+
+        .status-dot.ready { background: var(--goon-green); }
+        .status-dot.error { background: var(--goon-red); }
+        .status-dot.loading { background: var(--goon-purple); animation: pulse 1s infinite; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.3; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">🟣 Goon<span>Sharp</span> Playground</div>
+        <div class="toolbar">
+            <button onclick="compile()">▶ Transpile</button>
+            <button class="secondary" onclick="loadExample()">📦 Example</button>
+            <button class="secondary" onclick="clearAll()">🗑 Clear</button>
+        </div>
+    </header>
+
+    <div class="main">
+        <div class="panel">
+            <div class="panel-header">
+                <span>📝 GoonSharp Source</span>
+                <span class="tag">.goons</span>
+            </div>
+            <textarea id="source" spellcheck="false" placeholder="// Write your GoonSharp code here...
+goonsesh main() {
+    goonprint!(&quot;hello goon world&quot;);
+}">goonsesh main() {
+    goon message = "welcome to the goon zone 🟣";
+    goonprint!("{}", message);
+
+    goonfor i goonin 0..5 {
+        goonif (i % 2 == 0) {
+            goonprint!("{} is based", i);
+        } goonnah {
+            goonprint!("{} is mid", i);
+        }
+    }
+}</textarea>
+        </div>
+
+        <div class="panel">
+            <div class="panel-header">
+                <span>🦀 Generated Rust</span>
+                <span class="tag">.rs</span>
+            </div>
+            <div id="output" class="output">Click "Transpile" to compile your GoonSharp code...</div>
+        </div>
+    </div>
+
+    <div class="status-bar">
+        <span><span id="statusDot" class="status-dot ready"></span><span id="statusText">Ready</span></span>
+        <span>GoonSharp Playground v69.0.0 | Powered by WASM</span>
+    </div>
+
+    <script type="module">
+        // In production, this imports the WASM module built by wasm-pack
+        // import init, { compile_goonsharp } from './pkg/goonsharp_web.js';
+        //
+        // async function initWasm() {
+        //     await init();
+        //     window.wasmReady = true;
+        //     setStatus('ready', 'WASM loaded');
+        // }
+        // initWasm();
+
+        window.setStatus = function(state, text) {
+            document.getElementById('statusDot').className = 'status-dot ' + state;
+            document.getElementById('statusText').textContent = text;
+        };
+
+        window.compile = function() {
+            const source = document.getElementById('source').value;
+            const output = document.getElementById('output');
+
+            setStatus('loading', 'Transpiling...');
+
+            // When WASM is available:
+            // if (window.wasmReady) {
+            //     const result = compile_goonsharp(source);
+            //     if (result.success) {
+            //         output.textContent = result.rust_code;
+            //         output.className = 'output success';
+            //         setStatus('ready', 'Transpiled successfully');
+            //     } else {
+            //         output.textContent = result.errors;
+            //         output.className = 'output error';
+            //         setStatus('error', 'Compilation failed');
+            //     }
+            //     return;
+            // }
+
+            // Fallback: basic string-replace demo (no WASM)
+            let rust = source;
+            const replacements = [
+                [/\bgoonsesh\b/g, 'fn'],
+                [/\bgoon_const\b/g, 'const'],
+                [/\bgoon gooning\b/g, 'let mut'],
+                [/\bgoon\b/g, 'let'],
+                [/\bgoonprint!/g, 'println!'],
+                [/\bgoonformat!/g, 'format!'],
+                [/\bgoonvec!/g, 'vec!'],
+                [/\bgoonif\b/g, 'if'],
+                [/\bgoonnah\b/g, 'else'],
+                [/\bgoonfor\b/g, 'for'],
+                [/\bgoonin\b/g, 'in'],
+                [/\bgoonloop\b/g, 'loop'],
+                [/\bgoonwhile\b/g, 'while'],
+                [/\bgoonmatch\b/g, 'match'],
+                [/\bgoonreturn\b/g, 'return'],
+                [/\bcoom\b/g, 'break'],
+                [/\bgooncontinue\b/g, 'continue'],
+                [/\bgoonstruct\b/g, 'struct'],
+                [/\bgoonenum\b/g, 'enum'],
+                [/\bgoonimpl\b/g, 'impl'],
+                [/\bgoontrait\b/g, 'trait'],
+                [/\bgoonuse\b/g, 'use'],
+                [/\bgoonmod\b/g, 'mod'],
+                [/\bgoonpub\b/g, 'pub'],
+                [/\bedge\b/g, 'true'],
+                [/\bno_edge\b/g, 'false'],
+                [/\bno_goon\b/g, 'None'],
+                [/\bgooning\b/g, 'mut'],
+                [/\bgoonasync\b/g, 'async'],
+                [/\bgoonawait\b/g, 'await'],
+            ];
+
+            for (const [pattern, replacement] of replacements) {
+                rust = rust.replace(pattern, replacement);
+            }
+
+            output.textContent = rust;
+            output.className = 'output success';
+            setStatus('ready', 'Transpiled (JS fallback — build WASM for full parser)');
+        };
+
+        window.loadExample = function() {
+            document.getElementById('source').value = `// GoonSharp Example: Struct + Trait
+goonstruct Goon {
+    name: String,
+    power: i32,
+}
+
+goontrait Describable {
+    goonsesh describe(&self) -> String;
+}
+
+goonimpl Describable goonfor Goon {
+    goonsesh describe(&self) -> String {
+        goonformat!("{} (power: {})", self.name, self.power)
+    }
+}
+
+goonsesh main() {
+    goon g = Goon {
+        name: "Chad".to_string(),
+        power: 9001,
+    };
+
+    goonprint!("{}", g.describe());
+
+    goonmatch g.power {
+        0..=100 => goonprint!("normie tier"),
+        101..=1000 => goonprint!("mid tier"),
+        _ => goonprint!("GOON TIER 🟣"),
+    }
+}`;
+            compile();
+        };
+
+        window.clearAll = function() {
+            document.getElementById('source').value = '';
+            document.getElementById('output').textContent = 'Click "Transpile" to compile your GoonSharp code...';
+            document.getElementById('output').className = 'output';
+            setStatus('ready', 'Ready');
+        };
+    </script>
+</body>
+</html>

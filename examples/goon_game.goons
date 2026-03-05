@@ -1,0 +1,124 @@
+// Goon Game - a simple text RPG
+goonuse std::collections::HashMap;
+
+goonstruct Player {
+    name: String,
+    hp: i32,
+    max_hp: i32,
+    attack: i32,
+    xp: i32,
+    level: i32,
+}
+
+goonimpl Player {
+    goonsesh new(name: &str) -> Self {
+        Self {
+            name: name.to_string(),
+            hp: 100,
+            max_hp: 100,
+            attack: 10,
+            xp: 0,
+            level: 1,
+        }
+    }
+
+    goonsesh is_alive(&self) -> bool {
+        self.hp > 0
+    }
+
+    goonsesh take_damage(&gooning self, dmg: i32) {
+        self.hp -= dmg;
+        goonif (self.hp < 0) {
+            self.hp = 0;
+        }
+        goonprint!("  {} takes {} damage! HP: {}/{}", self.name, dmg, self.hp, self.max_hp);
+    }
+
+    goonsesh gain_xp(&gooning self, amount: i32) {
+        self.xp += amount;
+        goonif (self.xp >= self.level * 100) {
+            self.level += 1;
+            self.attack += 5;
+            self.max_hp += 20;
+            self.hp = self.max_hp;
+            goonprint!("🎉 {} leveled up to {}! ATK: {} HP: {}", self.name, self.level, self.attack, self.max_hp);
+        }
+    }
+}
+
+goonstruct Monster {
+    name: String,
+    hp: i32,
+    attack: i32,
+    xp_reward: i32,
+}
+
+goonimpl Monster {
+    goonsesh is_alive(&self) -> bool {
+        self.hp > 0
+    }
+
+    goonsesh take_damage(&gooning self, dmg: i32) {
+        self.hp -= dmg;
+        goonif (self.hp < 0) {
+            self.hp = 0;
+        }
+        goonprint!("  {} takes {} damage! HP: {}", self.name, dmg, self.hp);
+    }
+}
+
+goonsesh battle(player: &gooning Player, monster: &gooning Monster) {
+    goonprint!("\n⚔️  {} vs {} ⚔️", player.name, monster.name);
+
+    goon gooning round = 0;
+    goonloop {
+        round += 1;
+        goonprint!("\n--- Round {} ---", round);
+
+        // Player attacks
+        monster.take_damage(player.attack);
+        goonif (!monster.is_alive()) {
+            goonprint!("💀 {} defeated {}!", player.name, monster.name);
+            player.gain_xp(monster.xp_reward);
+            coom;
+        }
+
+        // Monster attacks
+        player.take_damage(monster.attack);
+        goonif (!player.is_alive()) {
+            goonprint!("💀 {} was ruined by {}!", player.name, monster.name);
+            coom;
+        }
+    }
+}
+
+goonsesh main() {
+    goon gooning player = Player::new("GoonSlayer");
+    goonprint!("🟣 Welcome, {}!", player.name);
+
+    goon monsters = [
+        ("Goblin Gooner", 30, 5, 50),
+        ("Orc Edger", 60, 12, 100),
+        ("Dragon of Coom", 120, 20, 300),
+    ];
+
+    goonfor (name, hp, atk, xp) goonin &monsters {
+        goonif (!player.is_alive()) {
+            goonprint!("\n💀 GAME OVER 💀");
+            coom;
+        }
+
+        goon gooning monster = Monster {
+            name: name.to_string(),
+            hp: *hp,
+            attack: *atk,
+            xp_reward: *xp,
+        };
+
+        battle(&gooning player, &gooning monster);
+    }
+
+    goonif (player.is_alive()) {
+        goonprint!("\n🏆 {} WINS! Final Level: {} 🏆", player.name, player.level);
+    }
+}

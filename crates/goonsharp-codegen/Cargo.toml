@@ -1,0 +1,8 @@
+[package]
+name = "goonsharp-codegen"
+version.workspace = true
+edition.workspace = true
+description = "GoonSharp AST to Rust source code transpiler"
+
+[dependencies]
+goonsharp-parser.workspace = true
