@@ -2,7 +2,7 @@
   "name": "goonsharp",
   "displayName": "GoonSharp Official",
   "description": "The official VS Code extension for GoonSharp — syntax highlighting, IntelliSense, and goon-level productivity.",
-  "version": "69.0.0",
+  "version": "69.0.1",
   "publisher": "MichaelTunwashe",
   "icon": "icon.png",
   "engines": {
