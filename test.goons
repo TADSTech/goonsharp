@@ -18,3 +18,5 @@ goonsesh main() {
     goon result = add(69, 420);
     goonprint!("final goon score: {}", result);
 }
+
+goon name()
