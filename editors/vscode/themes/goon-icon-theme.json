@@ -1,0 +1,38 @@
+{
+  "hidesExplorerArrows": false,
+  "iconDefinitions": {
+    "_goons_file": {
+      "iconPath": "../icons/goons-file-icon.svg"
+    },
+    "_goons_file_dark": {
+      "iconPath": "../icons/goons-file-icon-dark.svg"
+    },
+    "_default_file": {
+      "iconPath": "../icons/goons-file-icon.svg"
+    }
+  },
+  "file": "_default_file",
+  "fileExtensions": {
+    "goons": "_goons_file_dark"
+  },
+  "languageIds": {
+    "goonsharp": "_goons_file_dark"
+  },
+  "light": {
+    "file": "_default_file",
+    "fileExtensions": {
+      "goons": "_goons_file"
+    },
+    "languageIds": {
+      "goonsharp": "_goons_file"
+    }
+  },
+  "highContrast": {
+    "fileExtensions": {
+      "goons": "_goons_file_dark"
+    },
+    "languageIds": {
+      "goonsharp": "_goons_file_dark"
+    }
+  }
+}

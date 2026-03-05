@@ -14,6 +14,7 @@
     { "include": "#boolean-keywords" },
     { "include": "#special-keywords" },
     { "include": "#operators" },
+    { "include": "#easter-eggs" },
     { "include": "#numbers" },
     { "include": "#functions" },
     { "include": "#types" },
@@ -213,6 +214,42 @@
         {
           "name": "keyword.operator.question.goonsharp",
           "match": "\\?"
+        }
+      ]
+    },
+    "easter-eggs": {
+      "patterns": [
+        {
+          "name": "constant.numeric.nice.goonsharp",
+          "match": "\\b69\\b"
+        },
+        {
+          "name": "constant.numeric.blaze.goonsharp",
+          "match": "\\b420\\b"
+        },
+        {
+          "name": "constant.numeric.leet.goonsharp",
+          "match": "\\b1337\\b"
+        },
+        {
+          "name": "constant.numeric.goated.goonsharp",
+          "match": "\\b(6969|42069|80085|8008135)\\b"
+        },
+        {
+          "name": "keyword.easter.gooner.goonsharp",
+          "match": "\\b(gooner|gooners|gooning_hard)\\b"
+        },
+        {
+          "name": "keyword.easter.bruh.goonsharp",
+          "match": "\\b(bruh|ayo|sheesh|bussin|nocap|frfr|ong)\\b"
+        },
+        {
+          "name": "keyword.easter.sigma.goonsharp",
+          "match": "\\b(sigma|alpha|chad|based|rizz|gyatt|ohio|skibidi|fanum_tax)\\b"
+        },
+        {
+          "name": "keyword.easter.gaming.goonsharp",
+          "match": "\\b(gg|ez|ratio|cope|seethe|mald|kekw)\\b"
         }
       ]
     },

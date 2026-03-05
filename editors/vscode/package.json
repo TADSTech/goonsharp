@@ -4,7 +4,7 @@
   "description": "The official VS Code extension for GoonSharp — syntax highlighting, IntelliSense, and goon-level productivity.",
   "version": "69.0.0",
   "publisher": "goonsharp",
-  "icon": "icon.png",
+  "icon": "icons/goonsharp-logo.svg",
   "engines": {
     "vscode": "^1.80.0"
   },
@@ -55,6 +55,13 @@
         "label": "DarkGoon",
         "uiTheme": "vs-dark",
         "path": "./themes/goon-dark.json"
+      }
+    ],
+    "iconThemes": [
+      {
+        "id": "goonsharp-icons",
+        "label": "GoonSharp Icons",
+        "path": "./themes/goon-icon-theme.json"
       }
     ],
     "snippets": [
