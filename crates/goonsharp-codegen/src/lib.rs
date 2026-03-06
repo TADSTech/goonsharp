@@ -165,7 +165,7 @@ fn emit_struct(out: &mut String, s: &StructDef, level: usize) {
     match &s.fields {
         StructFields::Named(fields) => {
             out.push_str(" {\n");
-            for (i, field) in fields.iter().enumerate() {
+            for (_i, field) in fields.iter().enumerate() {
                 indent(out, level + 1);
                 emit_visibility(out, &field.visibility);
                 out.push_str(&field.name);
@@ -534,26 +534,26 @@ fn emit_pattern(out: &mut String, pat: &Pattern) {
                 emit_pattern(out, p);
             }
         }
-        Pattern::Binding(name, (pat, _)) => {
+        Pattern::Binding(name, inner) => {
             out.push_str(name);
             out.push_str(" @ ");
-            emit_pattern(out, pat);
+            emit_pattern(out, &inner.0);
         }
         Pattern::Rest => out.push_str(".."),
-        Pattern::Ref(is_mut, (pat, _)) => {
+        Pattern::Ref(is_mut, inner) => {
             out.push('&');
             if *is_mut {
                 out.push_str("mut ");
             }
-            emit_pattern(out, pat);
+            emit_pattern(out, &inner.0);
         }
         Pattern::Range(start, end) => {
-            if let Some((e, _)) = start {
-                emit_expr(out, e, 0);
+            if let Some(inner) = start {
+                emit_expr(out, &inner.0, 0);
             }
             out.push_str("..=");
-            if let Some((e, _)) = end {
-                emit_expr(out, e, 0);
+            if let Some(inner) = end {
+                emit_expr(out, &inner.0, 0);
             }
         }
         Pattern::Path(segments) => {
@@ -701,16 +701,16 @@ fn emit_expr(out: &mut String, expr: &Expr, level: usize) {
         Expr::Block(block) => emit_block(out, block, level),
         Expr::Return(inner) => {
             out.push_str("return");
-            if let Some((e, _)) = inner {
+            if let Some(boxed) = inner {
                 out.push(' ');
-                emit_expr(out, e, level);
+                emit_expr(out, &boxed.0, level);
             }
         }
         Expr::Break(inner) => {
             out.push_str("break");
-            if let Some((e, _)) = inner {
+            if let Some(boxed) = inner {
                 out.push(' ');
-                emit_expr(out, e, level);
+                emit_expr(out, &boxed.0, level);
             }
         }
         Expr::Continue => out.push_str("continue"),
@@ -794,12 +794,12 @@ fn emit_expr(out: &mut String, expr: &Expr, level: usize) {
                     emit_expr(out, val, level);
                 }
             }
-            if let Some((rest_expr, _)) = rest {
+            if let Some(boxed) = rest {
                 if !fields.is_empty() {
                     out.push_str(", ");
                 }
                 out.push_str("..");
-                emit_expr(out, rest_expr, level);
+                emit_expr(out, &boxed.0, level);
             }
             out.push_str(" }");
         }
@@ -808,16 +808,16 @@ fn emit_expr(out: &mut String, expr: &Expr, level: usize) {
             end,
             inclusive,
         } => {
-            if let Some((s, _)) = start {
-                emit_expr(out, s, level);
+            if let Some(boxed) = start {
+                emit_expr(out, &boxed.0, level);
             }
             if *inclusive {
                 out.push_str("..=");
             } else {
                 out.push_str("..");
             }
-            if let Some((e, _)) = end {
-                emit_expr(out, e, level);
+            if let Some(boxed) = end {
+                emit_expr(out, &boxed.0, level);
             }
         }
         Expr::Reference { is_mut, expr: inner } => {

@@ -303,6 +303,22 @@ fn build_project(manifest_path: &Path, release: bool) -> Result<PathBuf, ()> {
 }
 
 fn main() {
+    // chumsky's deeply-boxed recursive parsers need a larger stack
+    let builder = std::thread::Builder::new()
+        .name("goonhub-main".into())
+        .stack_size(64 * 1024 * 1024); // 64 MB
+
+    let handler = builder
+        .spawn(real_main)
+        .expect("failed to spawn main thread");
+
+    if let Err(e) = handler.join() {
+        eprintln!("goon error: thread panicked: {:?}", e);
+        std::process::exit(1);
+    }
+}
+
+fn real_main() {
     let cli = Cli::parse();
 
     match cli.command {

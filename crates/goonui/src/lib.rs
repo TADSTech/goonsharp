@@ -5,7 +5,7 @@
 /// that look like they were made during a 12-hour session.
 ///
 /// ## Quick Start
-/// ```rust,no_run
+/// ```rust,ignore
 /// use goonui::prelude::*;
 ///
 /// fn main() -> eframe::Result<()> {

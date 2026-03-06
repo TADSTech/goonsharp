@@ -3,7 +3,7 @@
 /// Purple-dominant with deep backgrounds, bright accents, and
 /// just the right amount of unhinged energy.
 
-use egui::{Color32, FontId, Rounding, Stroke, Style, TextStyle, Visuals};
+use egui::{Color32, FontId, Rounding, Stroke, TextStyle, Visuals};
 
 /// The GoonSharp purple.
 pub const GOON_PURPLE: Color32 = Color32::from_rgb(147, 51, 234);
@@ -94,7 +94,7 @@ pub fn apply_dark_goon_theme(ctx: &egui::Context) {
     // Spacing
     style.spacing.item_spacing = egui::vec2(8.0, 6.0);
     style.spacing.button_padding = egui::vec2(12.0, 6.0);
-    style.spacing.window_margin = egui::Margin::same(12);
+    style.spacing.window_margin = egui::Margin::same(12.0);
 
     ctx.set_style(style);
 }

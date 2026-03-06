@@ -153,6 +153,7 @@ fn compile_and_run(file: &PathBuf, run: bool, output: Option<PathBuf>, release: 
     // Phase 4: Compile with rustc
     let temp_dir = std::env::temp_dir();
     let rs_path = temp_dir.join("goon_temp.rs");
+    let has_explicit_output = output.is_some();
     let bin_path = output.unwrap_or_else(|| {
         if cfg!(target_os = "windows") {
             temp_dir.join("goon_temp.exe")
@@ -240,7 +241,7 @@ fn compile_and_run(file: &PathBuf, run: bool, output: Option<PathBuf>, release: 
         })?;
 
     // Cleanup temp binary (only if no explicit output)
-    if output.is_none() {
+    if !has_explicit_output {
         let _ = fs::remove_file(&bin_path);
     }
 
@@ -252,6 +253,22 @@ fn compile_and_run(file: &PathBuf, run: bool, output: Option<PathBuf>, release: 
 }
 
 fn main() {
+    // chumsky's deeply-boxed recursive parsers need a larger stack
+    let builder = std::thread::Builder::new()
+        .name("goonsharp-main".into())
+        .stack_size(64 * 1024 * 1024); // 64 MB
+
+    let handler = builder
+        .spawn(real_main)
+        .expect("failed to spawn main thread");
+
+    if let Err(e) = handler.join() {
+        eprintln!("goon error: thread panicked: {:?}", e);
+        std::process::exit(1);
+    }
+}
+
+fn real_main() {
     let cli = Cli::parse();
 
     match cli.command {
@@ -313,7 +330,7 @@ fn main() {
                 Err(_) => std::process::exit(1),
             }
         }
-        Some(Commands::Fmt { file }) => {
+        Some(Commands::Fmt { file: _ }) => {
             eprintln!(
                 "  {} goon code is already perfect. no formatting needed.",
                 "fmt:".bright_purple().bold()

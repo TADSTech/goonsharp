@@ -78,11 +78,19 @@ fn type_parser() -> impl Parser<Token, Spanned<Type>, Error = PErr> + Clone {
             .map(Type::Tuple);
 
         // Array type: [T; N] or Slice: [T]
+        // NOTE: array size uses a simplified expression (literal or path) to avoid
+        // infinite mutual recursion between type_parser ↔ expr_parser_inner.
+        let array_size = filter_map(|span, tok: Token| match tok {
+            Token::Int(n) => Ok(Expr::Literal(Literal::Int(n))),
+            Token::Ident(s) => Ok(Expr::Path(vec![s])),
+            _ => Err(Simple::expected_input_found(span, vec![], Some(tok))),
+        });
+
         let array_or_slice = tok(Token::LBracket)
             .ignore_then(ty.clone())
             .then(
                 tok(Token::Semi)
-                    .ignore_then(spanned(expr_parser_inner()))
+                    .ignore_then(spanned(array_size))
                     .or_not(),
             )
             .then_ignore(tok(Token::RBracket))
@@ -148,7 +156,7 @@ fn type_parser() -> impl Parser<Token, Spanned<Type>, Error = PErr> + Clone {
         ));
 
         spanned(base)
-    })
+    }).boxed()
 }
 
 // ─── Pattern Parser ──────────────────────────────────────────────────────────
@@ -228,7 +236,7 @@ fn pattern_parser() -> impl Parser<Token, Spanned<Pattern>, Error = PErr> + Clon
                     (Pattern::Or(pats), span)
                 }
             })
-    })
+    }).boxed()
 }
 
 // ─── Expression Parser ───────────────────────────────────────────────────────
@@ -533,28 +541,28 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
         // ── Atom: the smallest expression unit ──────────────
 
         let atom = choice((
-            print_expr,
-            eprint_expr,
-            ruin_expr,
-            dbg_expr,
-            vec_expr,
-            if_expr,
-            while_expr,
-            for_expr,
-            loop_expr,
-            match_expr,
-            return_expr,
-            break_expr,
-            continue_expr,
-            literal,
-            self_val,
-            closure,
-            ref_expr,
-            paren_or_tuple,
-            array,
-            block_expr,
-            path_expr,
-        ));
+            print_expr.boxed(),
+            eprint_expr.boxed(),
+            ruin_expr.boxed(),
+            dbg_expr.boxed(),
+            vec_expr.boxed(),
+            if_expr.boxed(),
+            while_expr.boxed(),
+            for_expr.boxed(),
+            loop_expr.boxed(),
+            match_expr.boxed(),
+            return_expr.boxed(),
+            break_expr.boxed(),
+            continue_expr.boxed(),
+            literal.boxed(),
+            self_val.boxed(),
+            closure.boxed(),
+            ref_expr.boxed(),
+            paren_or_tuple.boxed(),
+            array.boxed(),
+            block_expr.boxed(),
+            path_expr.boxed(),
+        )).boxed();
 
         // ── Postfix operations ──────────────────────────────
 
@@ -611,7 +619,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
             index.map(Postfix::Index),
             // Try: ?
             tok(Token::Question).to(Postfix::Try),
-        ));
+        )).boxed();
 
         let postfix = spanned(atom)
             .then(postfix_op.repeated())
@@ -645,7 +653,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                 };
                 (new_expr, span)
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // ── Prefix unary ────────────────────────────────────
 
@@ -666,7 +674,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // ── Cast ────────────────────────────────────────────
         let cast = spanned(unary.clone())
@@ -681,7 +689,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // ── Binary operators by precedence (lowest to highest) ─
 
@@ -706,7 +714,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Additive: + -
         let sum = spanned(product.clone())
@@ -728,7 +736,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Shift: << >>
         let shift = spanned(sum.clone())
@@ -750,7 +758,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Bitwise AND: &
         let bit_and = spanned(shift.clone())
@@ -771,7 +779,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Bitwise XOR: ^
         let bit_xor = spanned(bit_and.clone())
@@ -792,7 +800,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Bitwise OR: |
         let bit_or = spanned(bit_xor.clone())
@@ -813,7 +821,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Comparison: == != < > <= >=
         let comparison = spanned(bit_or.clone())
@@ -840,7 +848,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Logical AND: &&
         let logical_and = spanned(comparison.clone())
@@ -861,7 +869,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Logical OR: ||
         let logical_or = spanned(logical_and.clone())
@@ -882,7 +890,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     span,
                 )
             })
-            .map(|(e, _)| e);
+            .map(|(e, _)| e).boxed();
 
         // Range: a..b, a..=b, ..b, a..
         let range = spanned(logical_or.clone())
@@ -900,7 +908,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                     inclusive,
                 },
                 None => left.0,
-            });
+            }).boxed();
 
         // Assignment and compound assignment (right-associative)
         let assign_op = choice((
@@ -913,7 +921,7 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
             tok(Token::PipeEq).to(Some(BinOp::BitOr)),
             tok(Token::CaretEq).to(Some(BinOp::BitXor)),
             tok(Token::Eq).to(None),
-        ));
+        )).boxed();
 
         spanned(range.clone())
             .then(assign_op.then(spanned(range)).or_not())
@@ -929,18 +937,18 @@ fn expr_parser_inner() -> impl Parser<Token, Expr, Error = PErr> + Clone {
                 },
                 None => left.0,
             })
-    })
+    }).boxed()
 }
 
 /// Public expression parser producing spanned expressions.
 pub fn expr_parser() -> impl Parser<Token, Spanned<Expr>, Error = PErr> + Clone {
-    spanned(expr_parser_inner())
+    spanned(expr_parser_inner()).boxed()
 }
 
 // ─── Block Parser ────────────────────────────────────────────────────────────
 
 fn block_parser(
-    expr: impl Parser<Token, Expr, Error = PErr> + Clone,
+    expr: impl Parser<Token, Expr, Error = PErr> + Clone + 'static,
 ) -> impl Parser<Token, Block, Error = PErr> + Clone {
     let spanned_expr = spanned(expr.clone());
 
@@ -972,12 +980,13 @@ fn block_parser(
         },
     );
 
-    let stmt = let_stmt.or(expr_stmt);
+    let stmt = let_stmt.boxed().or(expr_stmt.boxed()).boxed();
 
     tok(Token::LBrace)
         .ignore_then(spanned(stmt).repeated())
         .then_ignore(tok(Token::RBrace))
         .map(|stmts| Block { stmts })
+        .boxed()
 }
 
 // ─── Item Parsers ────────────────────────────────────────────────────────────
@@ -1018,7 +1027,7 @@ fn param_parser() -> impl Parser<Token, Param, Error = PErr> + Clone {
         .then(type_parser())
         .map(|(pattern, ty)| Param { pattern, ty });
 
-    self_param.or(regular)
+    self_param.boxed().or(regular.boxed()).boxed()
 }
 
 fn generic_params_parser() -> impl Parser<Token, Vec<GenericParam>, Error = PErr> + Clone {
@@ -1034,7 +1043,7 @@ fn generic_params_parser() -> impl Parser<Token, Vec<GenericParam>, Error = PErr
                 .then(
                     tok(Token::Colon)
                         .ignore_then(
-                            spanned(type_parser().map(|(t, s)| t))
+                            spanned(type_parser().map(|(t, _s)| t))
                                 .separated_by(tok(Token::Plus))
                                 .at_least(1),
                         )
@@ -1287,7 +1296,7 @@ fn use_parser(
                         // Group: {a, b, c}
                         .or(tok(Token::LBrace)
                             .ignore_then(
-                                tree.separated_by(tok(Token::Comma)).allow_trailing(),
+                                tree.clone().separated_by(tok(Token::Comma)).allow_trailing(),
                             )
                             .then_ignore(tok(Token::RBrace))
                             .map(UseTree::Group))
@@ -1363,13 +1372,13 @@ pub fn item_parser() -> impl Parser<Token, Spanned<Item>, Error = PErr> + Clone 
             .repeated()
             .then(visibility())
             .then(choice((
-                function_parser(Visibility::Private).map(Item::Function),
-                struct_parser(Visibility::Private).map(Item::Struct),
-                enum_parser(Visibility::Private).map(Item::Enum),
-                impl_parser().map(Item::Impl),
-                trait_parser(Visibility::Private).map(Item::Trait),
-                use_parser(Visibility::Private).map(Item::Use),
-                mod_parser(Visibility::Private).map(Item::Mod),
+                function_parser(Visibility::Private).map(Item::Function).boxed(),
+                struct_parser(Visibility::Private).map(Item::Struct).boxed(),
+                enum_parser(Visibility::Private).map(Item::Enum).boxed(),
+                impl_parser().map(Item::Impl).boxed(),
+                trait_parser(Visibility::Private).map(Item::Trait).boxed(),
+                use_parser(Visibility::Private).map(Item::Use).boxed(),
+                mod_parser(Visibility::Private).map(Item::Mod).boxed(),
             )))
             .map(|((attrs, vis), mut item)| {
                 // Apply visibility
@@ -1390,7 +1399,7 @@ pub fn item_parser() -> impl Parser<Token, Spanned<Item>, Error = PErr> + Clone 
             })
     });
 
-    spanned(inner)
+    spanned(inner).boxed()
 }
 
 pub fn program_parser() -> impl Parser<Token, Program, Error = PErr> {
@@ -1398,4 +1407,5 @@ pub fn program_parser() -> impl Parser<Token, Program, Error = PErr> {
         .repeated()
         .then_ignore(end())
         .map(|items| Program { items })
+        .boxed()
 }

@@ -5,7 +5,7 @@
 /// - Unhinged naming that makes you giggle
 /// - Actually functional UI components
 
-use egui::{Response, Ui, Widget};
+use egui::{Response, Ui};
 
 use crate::theme::*;
 
