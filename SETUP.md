@@ -108,7 +108,7 @@ wasm-pack build crates/goonsharp-web --target web --out-dir ../../playground/pkg
 
 Then serve `crates/goonsharp-web/index.html` locally to test.
 
-**Status:** ⬜ Needs `wasm-pack` installed (`cargo install wasm-pack`).
+**Status:** ✅ WASM built. Output at `playground/pkg/`.
 
 ---
 
@@ -179,6 +179,99 @@ vsce package
 
 ---
 
+## Deploy to npm
+
+The `npm/` directory contains a ready-to-publish npm package that bundles the Linux x86_64 release binaries (`goonsharp` + `goonhub`).
+
+### 1. Build release binaries
+
+```bash
+cargo build --workspace --release
+```
+
+### 2. Copy binaries into the npm package
+
+```bash
+mkdir -p npm/bin
+cp target/release/goonsharp npm/bin/goonsharp
+cp target/release/goonhub npm/bin/goonhub
+chmod +x npm/bin/goonsharp npm/bin/goonhub
+```
+
+### 3. Verify the package contents
+
+```bash
+cd npm
+npm pack --dry-run
+```
+
+You should see `bin/goonsharp`, `bin/goonhub`, `install.js`, and `README.md`.
+
+### 4. Publish to npm
+
+```bash
+cd npm
+npm login          # one-time auth
+npm publish        # publishes as `goonsharp@69.0.0`
+```
+
+Users can then install globally:
+```bash
+npm install -g goonsharp
+```
+
+This installs two commands: `goonsharp` (compiler) and `goonhub` (package manager).
+
+> **Note:** Currently Linux x64 only. The `install.js` postinstall script validates the platform and shows a friendly error on unsupported systems. To add macOS/Windows, cross-compile the binaries and update the `os`/`cpu` fields in `npm/package.json`.
+
+**Status:** ✅ Package ready at `npm/`. Binaries copied from release build.
+
+---
+
+## Website (Vite)
+
+The `website/` directory contains a Vite + TypeScript single-page app with landing, installation, docs, and a live WASM playground. Themed to match the DarkGoon and GoonLight VS Code themes.
+
+### Development
+
+```bash
+cd website
+npm install        # or: bun install
+npx vite           # dev server at http://localhost:4200
+```
+
+### Production build
+
+```bash
+cd website
+npx vite build     # outputs to website/dist/
+```
+
+### Update WASM playground
+
+When the parser/codegen changes, rebuild the WASM module and copy it:
+
+```bash
+wasm-pack build crates/goonsharp-web --target web --out-dir ../../playground/pkg
+cp playground/pkg/goonsharp_web.js playground/pkg/goonsharp_web_bg.wasm website/public/wasm/
+```
+
+### Deploy
+
+The `website/dist/` directory is a static site. Deploy to any static host (Vercel, Netlify, Cloudflare Pages, GitHub Pages, etc.):
+
+```bash
+# Example: Netlify CLI
+npx netlify deploy --prod --dir=website/dist
+
+# Example: GitHub Pages (from dist)
+npx gh-pages -d website/dist
+```
+
+**Status:** ✅ Builds clean. 4 pages: Landing, Install, Docs, Playground (with WASM).
+
+---
+
 ## Docs
 
 ```bash
@@ -193,16 +286,18 @@ mdbook serve    # live preview at localhost:3000
 
 ## Summary
 
-| Component | Crate | Status |
+| Component | Crate/Dir | Status |
 |---|---|---|
 | Parser | `goonsharp-parser` | ✅ Builds clean |
 | Codegen | `goonsharp-codegen` | ✅ Builds clean |
 | CLI | `goonsharp` | ✅ Builds clean |
 | GoonHub | `goonhub` | ✅ Builds clean |
 | GoonUI | `goonui` | ✅ Builds clean |
-| Web Playground | `goonsharp-web` | ⬜ Needs `wasm-pack` |
-| VS Code Extension | — | ✅ Done |
-| Docs (mdBook) | — | ⬜ Not verified |
+| Web Playground | `goonsharp-web` | ✅ WASM built |
+| VS Code Extension | `editors/vscode/` | ✅ Done |
+| npm Package | `npm/` | ✅ Ready to publish |
+| Website | `website/` | ✅ Vite app built |
+| Docs (mdBook) | `docs/` | ⬜ Not verified |
 
 ---
 

@@ -1,0 +1,41 @@
+{
+  "name": "goonsharp",
+  "version": "69.0.0",
+  "description": "GoonSharp — the ultimate shitpost programming language 🟣",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/goonsharp/goonsharp"
+  },
+  "homepage": "https://goonsharp.dev",
+  "keywords": [
+    "goonsharp",
+    "programming-language",
+    "transpiler",
+    "rust",
+    "meme",
+    "shitpost",
+    "goon"
+  ],
+  "bin": {
+    "goonsharp": "./bin/goonsharp",
+    "goonhub": "./bin/goonhub"
+  },
+  "os": [
+    "linux"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "scripts": {
+    "postinstall": "node install.js"
+  },
+  "files": [
+    "bin/",
+    "install.js",
+    "README.md"
+  ],
+  "engines": {
+    "node": ">=16"
+  }
+}
