@@ -603,6 +603,12 @@ fn emit_expr(out: &mut String, expr: &Expr, level: usize) {
             }
             out.push(')');
         }
+        Expr::Pipeline { left, right } => {
+            emit_expr(out, &right.0, level);
+            out.push('(');
+            emit_expr(out, &left.0, level);
+            out.push(')');
+        }
         Expr::MethodCall {
             receiver,
             method,
@@ -959,9 +965,9 @@ fn emit_literal(out: &mut String, lit: &Literal) {
 
 // ─── Blocks ──────────────────────────────────────────────────────────────────
 
-fn emit_block(out: &mut String, block: &Block, level: usize) {
+fn emit_block(out: &mut String, body: &IndentBlock, level: usize) {
     out.push_str("{\n");
-    for (stmt, _) in &block.stmts {
+    for (stmt, _) in &body.stmts {
         emit_stmt(out, stmt, level + 1);
     }
     indent(out, level);
@@ -992,15 +998,26 @@ fn emit_stmt(out: &mut String, stmt: &Stmt, level: usize) {
             }
             out.push_str(";\n");
         }
+        Stmt::Assignment { identifier, value } => {
+            indent(out, level);
+            out.push_str(identifier);
+            out.push_str(" = ");
+            emit_expr(out, &value.0, level);
+            out.push_str(";\n");
+        }
         Stmt::Semi((expr, _)) => {
             indent(out, level);
             emit_expr(out, expr, level);
             out.push_str(";\n");
         }
-        Stmt::Expr((expr, _)) => {
+        Stmt::ExprStmt((expr, _)) => {
             indent(out, level);
             emit_expr(out, expr, level);
             out.push('\n');
+        }
+        Stmt::Suite(block) => {
+            indent(out, level);
+            emit_block(out, block, level);
         }
         Stmt::Item((item, _)) => {
             emit_item(out, item, level);

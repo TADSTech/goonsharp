@@ -61,7 +61,7 @@ pub struct Function {
     pub params: Vec<Param>,
     pub return_type: Option<Spanned<Type>>,
     pub where_clause: Vec<WherePredicate>,
-    pub body: Spanned<Block>,
+    pub body: Spanned<IndentBlock>,
 }
 
 #[derive(Debug, Clone)]
@@ -310,10 +310,17 @@ pub enum Stmt {
         ty: Option<Spanned<Type>>,
         value: Option<Spanned<Expr>>,
     },
+    /// Pure Assignment missing the `let`/`mut` boilerplate: `x = 5`
+    Assignment {
+        identifier: String,
+        value: Box<Spanned<Expr>>,
+    },
     /// Expression with semicolon
     Semi(Spanned<Expr>),
-    /// Expression without semicolon (tail expression)
-    Expr(Spanned<Expr>),
+    /// A block of indented code
+    Suite(IndentBlock),
+    /// Pure Expression evaluated for side-effects
+    ExprStmt(Spanned<Expr>),
     /// An item inside a block
     Item(Spanned<Item>),
 }
@@ -384,6 +391,11 @@ pub enum Expr {
         func: Box<Spanned<Expr>>,
         args: Vec<Spanned<Expr>>,
     },
+    /// Pipeline Operator: `data |> process`
+    Pipeline {
+        left: Box<Spanned<Expr>>,
+        right: Box<Spanned<Expr>>,
+    },
     /// Method call: `x.foo(a, b)`
     MethodCall {
         receiver: Box<Spanned<Expr>>,
@@ -409,23 +421,23 @@ pub enum Expr {
     /// If expression
     If {
         condition: Box<Spanned<Expr>>,
-        then_block: Spanned<Block>,
+        then_block: Spanned<IndentBlock>,
         else_block: Option<Box<Spanned<Expr>>>,
     },
     /// While loop
     While {
         condition: Box<Spanned<Expr>>,
-        body: Spanned<Block>,
+        body: Spanned<IndentBlock>,
     },
     /// For loop
     For {
         pattern: Spanned<Pattern>,
         iter: Box<Spanned<Expr>>,
-        body: Spanned<Block>,
+        body: Spanned<IndentBlock>,
     },
     /// Infinite loop (`goonforever` / `edging`)
     Loop {
-        body: Spanned<Block>,
+        body: Spanned<IndentBlock>,
     },
     /// Match expression
     Match {
@@ -433,7 +445,7 @@ pub enum Expr {
         arms: Vec<MatchArm>,
     },
     /// Block expression
-    Block(Block),
+    Block(IndentBlock),
     /// Return
     Return(Option<Box<Spanned<Expr>>>),
     /// Break
@@ -550,7 +562,7 @@ pub struct MatchArm {
 // ─── Block ───────────────────────────────────────────────────────────────────
 
 #[derive(Debug, Clone)]
-pub struct Block {
+pub struct IndentBlock {
     pub stmts: Vec<Spanned<Stmt>>,
 }
 

@@ -949,7 +949,7 @@ pub fn expr_parser() -> impl Parser<Token, Spanned<Expr>, Error = PErr> + Clone 
 
 fn block_parser(
     expr: impl Parser<Token, Expr, Error = PErr> + Clone + 'static,
-) -> impl Parser<Token, Block, Error = PErr> + Clone {
+) -> impl Parser<Token, IndentBlock, Error = PErr> + Clone {
     let spanned_expr = spanned(expr.clone());
 
     // Let statement
@@ -969,13 +969,12 @@ fn block_parser(
             }
         });
 
-    // Expression statement (with or without semicolon)
     let expr_stmt = spanned_expr.clone().then(tok(Token::Semi).or_not()).map(
         |(expr, semi)| {
             if semi.is_some() {
                 Stmt::Semi(expr)
             } else {
-                Stmt::Expr(expr)
+                Stmt::ExprStmt(expr)
             }
         },
     );
@@ -985,7 +984,7 @@ fn block_parser(
     tok(Token::LBrace)
         .ignore_then(spanned(stmt).repeated())
         .then_ignore(tok(Token::RBrace))
-        .map(|stmts| Block { stmts })
+        .map(|stmts| IndentBlock { stmts })
         .boxed()
 }
 

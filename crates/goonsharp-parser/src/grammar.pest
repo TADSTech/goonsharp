@@ -1,0 +1,43 @@
+WHITESPACE = _{ " " | "\t" }
+COMMENT = _{ "//" ~ (!NEWLINE ~ ANY)* ~ NEWLINE }
+
+ident = @{ ASCII_ALPHA ~ (ASCII_ALPHANUMERIC | "_")* }
+literal = @{ ASCII_DIGIT+ }
+
+// Primary expressions
+primary_expr = { ident | literal | "(" ~ expr ~ ")" }
+
+// Function call: func(arg1, arg2)
+call_args = { "(" ~ (expr ~ ("," ~ expr)*)? ~ ")" }
+call_expr = { primary_expr ~ call_args* }
+
+// Pipeline expression: data |> step1 |> step2
+pipeline_op = { "|>" }
+// Pipeline associates left-to-right
+expr = { call_expr ~ (WHITESPACE* ~ pipeline_op ~ WHITESPACE* ~ call_expr)* }
+
+// Statements
+assignment = { ident ~ "=" ~ expr }
+return_stmt = { "return" ~ expr }
+expr_stmt = { expr }
+
+// A single logical line (ended by NEWLINE)
+simple_stmt = { (assignment | return_stmt | expr_stmt) ~ NEWLINE+ }
+
+// Control flow
+if_stmt = { "if" ~ expr ~ ":" ~ NEWLINE ~ block }
+
+stmt = { if_stmt | simple_stmt }
+
+// A block is an INDENT, followed by statements, followed by a DEDENT
+// (Note: INDENT/DEDENT typically require a custom lexer step before Pest)
+block = { INDENT ~ stmt+ ~ DEDENT }
+
+// Function definition
+type_annot = { "::" ~ ident }
+param = { ident ~ type_annot? }
+param_list = { param ~ ("," ~ param)* }
+func_def = { "def" ~ ident ~ "(" ~ param_list? ~ ")" ~ ("->" ~ ident)? ~ ":" ~ NEWLINE ~ block }
+
+// Program is a serial accumulation of functions or statements
+program = { SOI ~ (func_def | stmt)* ~ EOI }
