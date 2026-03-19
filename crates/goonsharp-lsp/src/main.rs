@@ -50,6 +50,10 @@ impl LanguageServer for Backend {
             .publish_diagnostics(uri, vec![diagnostic], None)
             .await;
     }
+
+    async fn shutdown(&self) -> Result<()> {
+        Ok(())
+    }
 }
 
 #[tokio::main]
