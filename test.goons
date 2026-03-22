@@ -1,3 +1,7 @@
+goonsesh add(a: i32, b: i32) -> i32 {
+    goonreturn a + b;
+}
+
 goonsesh main() {
     goon counter = 10;
     goon message = "gooning hard";
@@ -11,12 +15,6 @@ goonsesh main() {
         goonprint!("session over. you coomed.");
     }
 
-    goonsesh add(a: i32, b: i32) -> i32 {
-        goonreturn a + b;
-    }
-
     goon result = add(69, 420);
     goonprint!("final goon score: {}", result);
 }
-
-goon name()

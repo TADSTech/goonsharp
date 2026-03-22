@@ -1,56 +1,41 @@
 use wasm_bindgen::prelude::*;
 use goonsharp_parser::{lex, parse};
 use goonsharp_codegen::transpile;
+use serde::Serialize;
 
-#[wasm_bindgen]
+#[derive(Serialize)]
 pub struct CompileResult {
     success: bool,
-    rust_code: String,
-    errors: String,
+    output: Option<String>,
+    errors: Vec<String>,
 }
 
 #[wasm_bindgen]
-impl CompileResult {
-    #[wasm_bindgen(getter)]
-    pub fn success(&self) -> bool {
-        self.success
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn rust_code(&self) -> String {
-        self.rust_code.clone()
-    }
-
-    #[wasm_bindgen(getter)]
-    pub fn errors(&self) -> String {
-        self.errors.clone()
-    }
-}
-
-#[wasm_bindgen]
-pub fn compile_goonsharp(source: &str) -> CompileResult {
-    let (tokens, lex_errors) = lex(source);
+pub fn compile_to_json(source: String) -> String {
+    let (tokens, lex_errors) = lex(&source);
 
     if !lex_errors.is_empty() {
         let error_msgs: Vec<String> = lex_errors
             .iter()
             .map(|e| format!("Lex error: {:?}", e))
             .collect();
-        return CompileResult {
+        let res = CompileResult {
             success: false,
-            rust_code: String::new(),
-            errors: error_msgs.join("\n"),
+            output: None,
+            errors: error_msgs,
         };
+        return serde_json::to_string(&res).unwrap_or_else(|_| "{}".to_string());
     }
 
     let tokens = match tokens {
         Some(t) => t,
         None => {
-            return CompileResult {
+            let res = CompileResult {
                 success: false,
-                rust_code: String::new(),
-                errors: "Failed to tokenize".to_string(),
+                output: None,
+                errors: vec!["Failed to tokenize".to_string()],
             };
+            return serde_json::to_string(&res).unwrap_or_else(|_| "{}".to_string());
         }
     };
 
@@ -61,28 +46,42 @@ pub fn compile_goonsharp(source: &str) -> CompileResult {
             .iter()
             .map(|e| format!("Parse error: {:?}", e))
             .collect();
-        return CompileResult {
+        let res = CompileResult {
             success: false,
-            rust_code: String::new(),
-            errors: error_msgs.join("\n"),
+            output: None,
+            errors: error_msgs,
         };
+        return serde_json::to_string(&res).unwrap_or_else(|_| "{}".to_string());
     }
 
-    match ast {
+    let res = match ast {
         Some(program) => CompileResult {
             success: true,
-            rust_code: transpile(&program),
-            errors: String::new(),
+            output: Some(transpile(&program)),
+            errors: vec![],
         },
         None => CompileResult {
             success: false,
-            rust_code: String::new(),
-            errors: "Failed to parse program".to_string(),
+            output: None,
+            errors: vec!["Failed to parse program".to_string()],
         },
-    }
+    };
+
+    serde_json::to_string(&res).unwrap_or_else(|_| "{}".to_string())
 }
 
 #[wasm_bindgen]
 pub fn get_version() -> String {
     "GoonSharp Web Playground v69.0.0".to_string()
 }
+
+/*
+How to Mock the File System for the Browser Environment:
+WebAssembly in JS runtimes does not have native access to std::fs (it will panic or fail).
+To support things like module imports across files:
+1. Define a Vfs (Virtual File System) trait in your compiler core:
+   trait Vfs { fn read_file(&self, path: &str) -> Option<String>; }
+2. For the native build (#[cfg(not(target_arch = "wasm32"))]), implement Vfs via std::fs::read_to_string.
+3. For WebAssembly builds, implement Vfs as an in-memory dictionary (HashMap<String, String>).
+4. Expose a wasm_bindgen function allowing JavaScript to preload the dictionary before triggering the compile_to_json.
+*/

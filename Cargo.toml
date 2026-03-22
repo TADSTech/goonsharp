@@ -6,6 +6,7 @@ members = [
     "crates/goonhub",
     "crates/goonui",
     "crates/goonsharp-web",
+    "crates/goonsharp-lsp",
 ]
 resolver = "2"
 
